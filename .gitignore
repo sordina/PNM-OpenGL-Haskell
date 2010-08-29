@@ -1,0 +1,8 @@
+*
+!.gitignore
+!*/
+!*.hs
+!*.cpp
+!*.txt
+!*.cabal
+
