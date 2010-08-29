@@ -20,7 +20,8 @@ parsePNM :: ByteString -> PF.PNM
 parsePNM = undefined
 
 pnmParser = do
-  pf <- P.choice $ L.map mkPFParser PF.descriptorLookup
+  pf <- P.choice (L.map mkPFParser PF.descriptorLookup)
+        <?> "Invalid file descriptor. Valid choices: [P1..P6]."
   P.newline
   return ()
 
