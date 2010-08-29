@@ -15,7 +15,7 @@ where
 data PNM = PNM {
     getDescriptor :: Descriptor,
     getResolution :: Resolution,
-    getMax :: Integer,
+    getMax :: Maybe Integer,
     getData :: PixelData
   }
 
