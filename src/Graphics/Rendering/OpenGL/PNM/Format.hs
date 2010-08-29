@@ -8,7 +8,7 @@ module Graphics.Rendering.OpenGL.PNM.Format
    descriptorLookup,
    Resolution,
    PixelData,
-   Color)
+   Color(..))
 
 where
 
@@ -18,6 +18,7 @@ data PNM = PNM {
     getMax :: Maybe Integer,
     getData :: PixelData
   }
+  deriving (Eq, Ord, Show)
 
 data Descriptor = P1 | P2 | P3 | P4 | P5 | P6
   deriving (Eq, Ord, Show, Enum)
@@ -30,6 +31,7 @@ data Color = Color {
   red   :: Integer,
   green :: Integer,
   blue  :: Integer }
+  deriving (Eq, Ord, Show)
 
 descriptors :: [Descriptor]
 descriptors = enumFrom P1

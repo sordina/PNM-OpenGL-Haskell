@@ -1,25 +1,26 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Graphics.Rendering.OpenGL.PNM.Reader
 where
 
+import Control.Monad
 import Data.List as L
 import Data.Bits as B
-import Text.ParserCombinators.Parsec as P
+import Text.Parsec as P
 import qualified Data.ByteString.Lazy.Char8 as C
 
 import Graphics.Rendering.OpenGL.PNM.Format as PF
 import Utilities.QuickCheck as Q
 
--- Types
-
 type FileHandle = String
 
--- Definitions
+-- TODO: Use bytestrings here.
+readFilePNM :: FileHandle -> IO (Either ParseError PF.PNM)
+readFilePNM = liftM (runParser pnmParser () "Parsing PNM string")
+              . readFile
 
-readFilePNM :: FileHandle -> IO PF.PNM
-readFilePNM = undefined
-
-parsePNM :: C.ByteString -> PF.PNM
-parsePNM = undefined
+parsePNM :: String -> Either ParseError PF.PNM
+parsePNM = runParser pnmParser () "Parsing PNM string"
 
 prop_parse = Q.mkPropComp resolutionParser "10 20" (10,20)
 
@@ -32,12 +33,10 @@ pnmParser = do
 
   pixelData <- dataParser pf
 
-  let maxVal = Nothing
-
-  return $ PNM { getDescriptor = pf,
-                 getResolution = resolution,
-                 getMax        = maxVal,
-                 getData       = pixelData }
+  return PNM { getDescriptor = pf,
+               getResolution = resolution,
+               getMax        = Nothing,
+               getData       = pixelData }
 
 pfParser = P.choice (L.map mkPFParser PF.descriptorLookup)
   where
@@ -60,8 +59,7 @@ p1bits = P.sepBy1 binaryChar P.spaces
 
 dataParser P1 = do
   bits <- P.many1 p1bits
-  let nums = map bitToColor bits
-  return []
+  return $ map bitToColor bits
 
 dataParser P2 = return []
 dataParser P3 = return []
@@ -69,12 +67,12 @@ dataParser P4 = return []
 dataParser P5 = return []
 dataParser P6 = return []
 
-prop_dataParser1 = Q.mkPropComp (dataParser P1) "1 0 1 1 1" [o,z,o,o,o]
+prop_dataParser1 = Q.mkPropComp (dataParser P1) "1 0 1 \n 1 1" [o,z,o,o,o]
   where
-    z = (0,0,0)
-    o = (1,1,1)
+    z = PF.Color 0 0 0
+    o = PF.Color 1 1 1
 
 -- TODO: Figure out why this is a string...
-bitToColor "0" = (0,0,0)
-bitToColor "1" = (1,1,1)
+bitToColor "0" = PF.Color 0 0 0
+bitToColor "1" = PF.Color 1 1 1
 bitToColor  b  = error $ "Invalid bit: [" ++ b ++ "]."
