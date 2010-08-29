@@ -3,9 +3,11 @@ where
 
 import Data.List as L
 import Data.Bits as B
-import qualified Data.ByteString.Lazy.Char8 as C
 import Text.ParserCombinators.Parsec as P
+import qualified Data.ByteString.Lazy.Char8 as C
+
 import Graphics.Rendering.OpenGL.PNM.Format as PF
+import Utilities.QuickCheck as Q
 
 -- Types
 
@@ -45,9 +47,7 @@ resolutionParser = do
   y <- digits
   return (read x, read y)
 
-prop_resolutionParser = case runParser resolutionParser () "resolution test" "10 20" of
-                             Right (10,20) -> True
-                             otherwise     -> False
+prop_resolutionParser = Q.mkPropComp resolutionParser "10 20" (10,20)
 
 digits = P.many1 digit
 
