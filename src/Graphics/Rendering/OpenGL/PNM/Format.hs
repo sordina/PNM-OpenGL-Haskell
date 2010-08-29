@@ -3,7 +3,9 @@ module Graphics.Rendering.OpenGL.PNM.Format
   (PNM(..),
    Descriptor(..),
    descriptor,
+   descriptors,
    descriptorStrings,
+   descriptorLookup,
    Resolution,
    PixelData,
    Color)
@@ -29,6 +31,9 @@ data Color = Color {
   green :: Integer,
   blue  :: Integer }
 
+descriptors :: [Descriptor]
+descriptors = enumFrom P1
+
 descriptor :: Descriptor -> String
 descriptor P1 = "Portable bitmap ASCII"
 descriptor P2 = "Portable graymap  ASCII"
@@ -38,4 +43,7 @@ descriptor P5 = "Portable graymap  Binary"
 descriptor P6 = "Portable pixmap"
 
 descriptorStrings :: [String]
-descriptorStrings = map show $ enumFrom P1
+descriptorStrings = map show descriptors
+
+descriptorLookup :: [(String,Descriptor)]
+descriptorLookup = zip descriptorStrings descriptors
