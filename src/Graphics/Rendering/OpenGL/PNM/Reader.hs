@@ -3,8 +3,8 @@
 module Graphics.Rendering.OpenGL.PNM.Reader
 where
 
-import Control.Monad
 import "mtl" Control.Monad.Identity (Identity)
+import Control.Monad
 import Data.List as L
 import Data.Bits as B
 import Data.Char as A
@@ -27,11 +27,10 @@ parsePNM = runParser pnmParser () "Parsing PNM string"
 prop_parse = Q.mkPropComp resolutionParser "10 20" (10,20)
 
 pnmParser = do
-  pf         <- andNL (pfParser         <?> "Invalid file descriptor. Valid choices: [P1..P6].")
-  resolution <- andNL (resolutionParser <?> "Invalid resolution specified. Format is: \"<W> <H>\".")
-  max        <-        maxParser        <?> "Invalid maximum value."
-
-  pixelData <- dataParser pf
+  pf         <- andNL pfParser         <?> "Invalid file descriptor. Valid choices: [P2..P6]."
+  resolution <- andNL resolutionParser <?> "Invalid resolution specified. Format is: \"<W> <H>\"."
+  max        <-       maxParser        <?> "Invalid maximum value."
+  pixelData  <-       dataParser pf    <?> "Invalid pixel data."
 
   return PNM { getDescriptor = pf,
                getResolution = resolution,
