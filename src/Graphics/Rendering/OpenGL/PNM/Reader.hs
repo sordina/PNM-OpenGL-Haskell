@@ -1,7 +1,10 @@
+{-# Language PackageImports #-}
+
 module Graphics.Rendering.OpenGL.PNM.Reader
 where
 
 import Control.Monad
+import "mtl" Control.Monad.Identity (Identity)
 import Data.List as L
 import Data.Bits as B
 import Data.Char as A
@@ -24,21 +27,15 @@ parsePNM = runParser pnmParser () "Parsing PNM string"
 prop_parse = Q.mkPropComp resolutionParser "10 20" (10,20)
 
 pnmParser = do
-  pf <- pfParser <?> "Invalid file descriptor. Valid choices: [P1..P6]."
-  P.newline
-
-  resolution <- resolutionParser <?> "Invalid resolution specified. Format is: \"<W> <H>\"."
-  P.newline
-
-  -- TODO: Rewind and fall back to regular parsing if max fails.
-  max <- maxParser <?> "Invalid maximum value."
-  P.newline
+  pf         <- andNL (pfParser         <?> "Invalid file descriptor. Valid choices: [P1..P6].")
+  resolution <- andNL (resolutionParser <?> "Invalid resolution specified. Format is: \"<W> <H>\".")
+  max        <-        maxParser        <?> "Invalid maximum value."
 
   pixelData <- dataParser pf
 
   return PNM { getDescriptor = pf,
                getResolution = resolution,
-               getMax        = Nothing,
+               getMax        = max,
                getData       = pixelData }
 
 pfParser = P.choice (L.map mkPFParser PF.descriptorLookup)
@@ -53,9 +50,13 @@ resolutionParser = do
   y <- digits
   return (read x, read y)
 
-maxParser = liftM (read :: String -> Integer) digits
-
 prop_resolutionParser = Q.mkPropComp resolutionParser "10 20" (10,20)
+
+maxParser :: ParsecT [Char] u Identity (Maybe Integer) -- Signature to specialize 'read'
+maxParser = try (andNL $ liftM (Just . read) digits) <|> return Nothing
+
+prop_maxParser1 = Q.mkPropComp maxParser "10\n" (Just 10)
+prop_maxParser2 = Q.mkPropComp maxParser "10"    Nothing
 
 digits = P.many1 digit
 
@@ -82,3 +83,8 @@ bitToColor  b  = error $ "Invalid bit: [" ++ b ++ "]."
 tripplet = do
   [r,g,b] <- liftM (map (fromIntegral . A.ord)) (P.count 3 P.anyChar)
   return $ PF.Color r g b
+
+andNL parser = do
+  res <- parser
+  P.newline
+  return res
