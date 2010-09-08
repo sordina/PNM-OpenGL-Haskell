@@ -3,13 +3,12 @@ import Graphics.UI.GLUT
 main = do
   getArgsAndInitialize
   initialDisplayMode $= [DoubleBuffered]
-  -- depthFunc       $= Just Less
 
   createWindow "PNM Viewer"
 
+  -- left, right, bottom, top -- Pixels start at top-left
+  ortho2D 0 100 100 0
   displayCallback $= display
-  -- idleCallback $= Just display
-
   mainLoop
 
 display = do
@@ -23,7 +22,9 @@ display = do
     glMatrixMode (GL_MODELVIEW)
     -}
 
+
     renderPrimitive Points grad
+
 
     flush
     swapBuffers
@@ -31,11 +32,11 @@ display = do
 grad = mapM_ f points
   where
     f (r,g) = do
-      rgb r g 1
+      rgb (r/100) (g/100) 1
       tv r g 0
 
 points :: [(D,D)]
-points = [(r/100,g/100) | g <- [0..100], r <- [0..100]]
+points = [(r,g) | g <- [0..100], r <- [0..100]]
 
 type D = GLdouble
 tv :: D -> D -> D -> IO ()
