@@ -1,46 +1,61 @@
 import Graphics.UI.GLUT
+import System.Time
+import Data.Maybe
+import qualified Graphics.Rendering.OpenGL.PNM.Reader as PNM
+import qualified Graphics.Rendering.OpenGL.PNM.Format as PNMF
 
 main = do
-  getArgsAndInitialize
+  (_,files) <- getArgsAndInitialize
+  mapM_ ((>>= renderPNM) . PNM.readFilePNM) files
+
+renderPNM (Left  error)   = print error
+renderPNM (Right pnmData) = do
+
   initialDisplayMode $= [DoubleBuffered]
 
   createWindow "PNM Viewer"
 
   -- left, right, bottom, top -- Pixels start at top-left
   ortho2D 0 100 100 0
-  displayCallback $= display
+  displayCallback       $= display pnmData
+  keyboardMouseCallback $= Just k
+
   mainLoop
 
-display = do
+k (Char 'f') _ _ _ = fullscreen
+k _          _ _ _ = return ()
+
+fullscreen = do
+  currentSize <- get windowSize
+  screenSize <- get screenSize
+  cursor $= None >> fullScreen
+
+display values = do
     clear [ColorBuffer]
-
-    {- For 2D display at full scale, taken from http://basic4gl.wikispaces.com/2D+Drawing+in+OpenGL
-    const XSize = 640, YSize = 480
-    glMatrixMode (GL_PROJECTION)
-    glLoadIdentity ();
-    glOrtho (0, XSize, YSize, 0, 0, 1)
-    glMatrixMode (GL_MODELVIEW)
-    -}
-
-
-    renderPrimitive Points grad
-
-
+    renderPrimitive Points (image values)
     flush
     swapBuffers
 
-grad = mapM_ f points
+image values = mapM_ f (zip (map wh [0..]) pnmData)
   where
-    f (r,g) = do
-      rgb (r/100) (g/100) 1
-      tv r g 0
+    (w,h)   = PNMF.getResolution values
+    pnmData = PNMF.getData       values
+    max     = i (fromMaybe 100 . PNMF.getMax) values
+    i       = (fromIntegral .)
+    fi      = (/8) . fromIntegral
+    wh n    = (n `mod` w, n `div` h)
 
-points :: [(D,D)]
-points = [(r,g) | g <- [0..100], r <- [0..100]]
+    f ((x,y),(color)) = do
+      rgb red green blue
+      tv (fi x) (fi y)
+        where
+          red   = i PNMF.red   color / max
+          green = i PNMF.green color / max
+          blue  = i PNMF.blue  color / max
 
 type D = GLdouble
-tv :: D -> D -> D -> IO ()
-tv x y z = vertex $ Vertex3 x y z
+tv :: D -> D -> IO ()
+tv x y = vertex $ Vertex3 x y 0
 
 rgb :: D -> D -> D -> IO ()
 rgb r g b = color $ Color3 r g b
