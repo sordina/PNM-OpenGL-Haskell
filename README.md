@@ -15,4 +15,4 @@ which is OS X only.
 
 Introducing: --- The Haskell PNM Viewer ---
 
-![Screenshot of the PNM viewer in action](/asdf)
+![Screenshot of the PNM viewer in action](raw/master/screenshots/proof_of_concept.png)
