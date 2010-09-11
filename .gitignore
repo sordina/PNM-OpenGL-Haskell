@@ -5,4 +5,4 @@
 !*.cpp
 !*.txt
 !*.cabal
-
+!*.png
