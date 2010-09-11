@@ -3,7 +3,7 @@ Haskell PNM Viewer
 
 The PNM format is beautiful. Never before have I seen such a simple practical format.
 
-[Here is the specification.]{http://en.wikipedia.org/wiki/Netpbm\_format}
+[Here is the specification](http://en.wikipedia.org/wiki/Netpbm\_format)
 
 Wow, typing that link would probably have taken longer than giving an informal specification...
 
