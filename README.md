@@ -13,6 +13,13 @@ The one program I found that could play with PNM files nicely was
 [ToyViewer]{http://www7a.biglobe.ne.jp/~ogihara/software/OSX/toyv-eng.html}
 which is OS X only.
 
-Introducing: --- The Haskell PNM Viewer ---
+## Introducing: --- The Haskell PNM Viewer --- ##
 
 ![Screenshot of the PNM viewer in action](/sordina/PNM-OpenGL-Haskell/raw/master/screenshots/proof_of_concept.png)
+
+## To Do: ##
+
+* Write parsers for formats other than 'P3'
+* Cater for missing 'max' values
+* Use bytestrings along with Parsec for a speed boost
+* Use OpenGL textures rather than pixels for awesome texture-loading goodness (and speed)
