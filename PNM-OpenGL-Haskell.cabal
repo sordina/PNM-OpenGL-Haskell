@@ -45,6 +45,10 @@ Build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 Cabal-version:       >=1.2
 
+executable pnm-view
+  main-is: main.hs
+  build-depends: OpenGL, base , GLUT, old-time,parsec,bytestring,mtl,monads-tf
+  hs-source-dirs: src
 
 Library
   -- Modules exported by the library.
@@ -58,4 +62,4 @@ Library
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   -- Build-tools:         
-  
+ 
