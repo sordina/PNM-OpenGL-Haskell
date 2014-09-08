@@ -14,7 +14,7 @@ which is OS X only.
 
 ## Introducing: --- The Haskell PNM Viewer --- ##
 
-![Screenshot of the PNM viewer in action](/sordina/PNM-OpenGL-Haskell/raw/master/screenshots/proof_of_concept.png)
+![Screenshot of the PNM viewer in action](https://raw.githubusercontent.com/sordina/PNM-OpenGL-Haskell/master/screenshots/proof_of_concept.png)
 
 ## To Do: ##
 
